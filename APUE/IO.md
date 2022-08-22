@@ -4,7 +4,28 @@
 ### 打开关闭
 - fopen()
     - open(linux)
+    
     - openfile(win)
+    
+      ~~~
+      FILE *fopen(const char *path,const char *mode);
+      ~~~
+    
+      Mode:
+    
+      r：只读方式打开，定位到文件开始位置，要求文件必须存在
+    
+      r+：读写方式打开，定位到文件开始位置，要求文件必须存在 
+    
+      w：只写方式打开，清空文件或创建文件，定位到文件开始位置
+    
+      w+：读写方式打开，清空文件或创建文件，定位到文件开始位置
+    
+      a：只写方式打开，追加方式打开，没有则创建，定位到文件末尾位置
+    
+      a+：读写方式打开，追加方式打开，没有则创建，读文件定位到文件开始位置，写文件定位到文件末尾位置
+    
+      mode作为字符串，只会从起始处开始匹配，直到匹配不上就结束匹配
 - fclose()
 ~~~ c
 #include <stdio.h>
@@ -43,6 +64,8 @@ int main()
 
 ~~~
 **如果一个系统函数有打开和其对应的关闭操作，那么函数的返回值是放在 堆 上的（malloc 与free），否则有可能在堆上也有可能在静态区**
+
+对于FILE结构体是放在堆上
 
 ~~~ bash
 /usr/include/asm-generic/errno-base.h
@@ -94,7 +117,27 @@ umask 022
 ~~~
 ### 读写
 - fgetc()
+
+~~~
+int fgetc(FILE *stream);
+int getc(FILE *stream);
+int getchar(char *s);
+~~~
+
+getchar相当于getc(stdin),getc相当于fgetc。getc被定义成宏来使用，fgetc被定义为函数使用。宏只占用编译时间，不占用调用时间，使用宏内核可以节省调用时间
+
+fgetc返回值为int类型
+
 - fputc()
+
+~~~
+int fputc(int c, FILE *stream);
+int putc(int c, FILE *stream);
+int putchar(int c);
+~~~
+
+putchar相当于putc(c,stdin),putc相当于fputc。
+
 ~~~ c
 #include <stdio.h>
 #include <stdlib.h>
@@ -131,8 +174,27 @@ int main(int argc,char **argv)
 
 ~~~
 - fgets()
+
+~~~
+int fgets(FILE *stream);
+char *gets(char *s);
+char *fgets(char *s, int size, FILE *stream);
+~~~
+
+gets有bug，只约定地址，未约定地址空间大小，可能越界。使用fgets替代。行缓冲模式读取。
+
+fgets的正常结束：1、读到了size-1字节，剩下一个字节给到'\0'。2、读到'\n'。
+
+特殊情况：对于n-1字节读取，需要两次读完。第二次读到'\n\0'。
+
 - fputs()
-cp 的fgets/fputs版本
+
+  ~~~
+  int fputs(const char *s, FILE *stream);
+  int puts(const chat *s);
+  ~~~
+
+- cp 的fgets/fputs版本
 ~~~ c
 #include <stdio.h>
 #include <stdlib.h>
@@ -192,6 +254,13 @@ int main()
 }
 ~~~
 - fread()
+~~~
+size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
+size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream);
+~~~
+
+fread:从stream读，读到ptr中。对象大小nmemb，读size个对象。返回成功读到的对象的个数。建议对象大小为1。
+
 - fwrite()
 cp的fread/fwrite版本
 ~~~ c
