@@ -7,7 +7,7 @@
     
     - openfile(win)
     
-      ~~~
+      ~~~c
       FILE *fopen(const char *path,const char *mode);
       ~~~
     
@@ -118,7 +118,7 @@ umask 022
 ### 读写
 - fgetc()
 
-~~~
+~~~c
 int fgetc(FILE *stream);
 int getc(FILE *stream);
 int getchar(char *s);
@@ -130,7 +130,7 @@ fgetc返回值为int类型
 
 - fputc()
 
-~~~
+~~~c
 int fputc(int c, FILE *stream);
 int putc(int c, FILE *stream);
 int putchar(int c);
@@ -175,7 +175,7 @@ int main(int argc,char **argv)
 ~~~
 - fgets()
 
-~~~
+~~~c
 int fgets(FILE *stream);
 char *gets(char *s);
 char *fgets(char *s, int size, FILE *stream);
@@ -189,7 +189,7 @@ fgets的正常结束：1、读到了size-1字节，剩下一个字节给到'\0'�
 
 - fputs()
 
-  ~~~
+  ~~~c
   int fputs(const char *s, FILE *stream);
   int puts(const chat *s);
   ~~~
@@ -254,7 +254,7 @@ int main()
 }
 ~~~
 - fread()
-~~~
+~~~c
 size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream);
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream);
 ~~~
@@ -304,7 +304,21 @@ int main()
 ~~~
 ### 打印与输入
 - printf()
+```c
+int printf(const char *format, ...);
+int fprintf(FILE *stream, const char *format, ...);
+int sprintf(char *str, const char *format, ...);
+int snprintf(char *str, size_t size, const char *format, ...);
+```
+
 - scanf()
+
+```c
+int scanf(const char *format, ...);
+int fscanf(FILE *stream, const char *format, ...);
+int sscanf(char *str, const char *format, ...);
+```
+
 ~~~ c
 #include <stdio.h>
 /*****************
@@ -382,6 +396,11 @@ int main()
 ~~~
 - ftell()
 - rewind()
+
+``` c
+(void) fseek(stream, 0L, SEEK_SET)
+```
+
 ### 刷新缓存
 - fflush()
 ~~~ c
@@ -396,11 +415,20 @@ printf("After while";)
 ##### 行缓冲
 换行时刷新 stdout
 ##### 全缓冲
-默认
+默认，满的时候刷新，强制刷新
 ##### 无缓冲
 stderr
+
+setvbuf可以修改文件的缓冲模式
+
 ### 取到完整的一行
-- getline()
+- getline() - GNU extensions, since  libc 4.6.27
+``` c
+ssize_t getline(char **lineptr, size_t *n, FILE *stream);
+```
+
+
+
 ~~~ c
 #include <stdio.h>
 #include <errno.h>
@@ -430,7 +458,20 @@ int main()
 }
 ~~~
 ### 临时文件
+
+- tmpnam()
+
+``` c
+char *tmpnam(char *s);
+// 创建临时文件的名字，并发情况下可能出现冲突
+```
+
 - tmpfile()
+``` c
+FILE *tmpfile(void);
+// 创建临时文件，以二进制读写方式打开，原子操作，匿名文件（1、无名字，不会冲突2、当close该文件时会直接关闭文件。当一个文件没有任何硬链接指向它，同时当前文件的打开计数为0时，这块文件数据应该被释放）
+```
+
 ~~~ c
 #include <stdio.h>
 #include <stdlib.h>
