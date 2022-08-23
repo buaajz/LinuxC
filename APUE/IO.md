@@ -4,27 +4,27 @@
 ### 打开关闭
 - fopen()
     - open(linux)
-    
+
     - openfile(win)
-    
+
       ~~~c
       FILE *fopen(const char *path,const char *mode);
       ~~~
-    
+
       Mode:
-    
+
       r：只读方式打开，定位到文件开始位置，要求文件必须存在
-    
-      r+：读写方式打开，定位到文件开始位置，要求文件必须存在 
-    
+
+      r+：读写方式打开，定位到文件开始位置，要求文件必须存在
+
       w：只写方式打开，清空文件或创建文件，定位到文件开始位置
-    
+
       w+：读写方式打开，清空文件或创建文件，定位到文件开始位置
-    
+
       a：只写方式打开，追加方式打开，没有则创建，定位到文件末尾位置
-    
+
       a+：读写方式打开，追加方式打开，没有则创建，读文件定位到文件开始位置，写文件定位到文件末尾位置
-    
+
       mode作为字符串，只会从起始处开始匹配，直到匹配不上就结束匹配
 - fclose()
 ~~~ c
@@ -111,7 +111,7 @@ int main()
 ~~~
 #### 新文件权限产生
 **mod = 0666 & ~umask**
-修改方式 
+修改方式
 ~~~ bash
 umask 022
 ~~~
@@ -379,7 +379,7 @@ int main()
         strerror(errno);
         exit(1);
     }
-    
+
     int i = 0;
     while(i < 10){
         unsigned long n = fwrite(buf,1,4,fp);
@@ -389,7 +389,7 @@ int main()
         fseek(fp,0,SEEK_END);
         i++;
     }
-    
+
     fseek(fp,1024,SEEK_CUR);
     return 0;
 }
@@ -489,10 +489,10 @@ int main()
         SIZE++;
     }
     printf("%d\n",SIZE);
-    
+
     fwrite(oribuf,1,SIZE,tmpfp);
     fseek(tmpfp,0,SEEK_SET);
-    
+
 
     FILE *fp;
     fp = fopen("tmp","w");
@@ -507,16 +507,46 @@ int main()
 ~~~
 ## sysio(系统IO)
 **fd**是文件IO中贯穿始终的类型
+
 ### 文件描述符的概念
 FILE *
 
 整型数，数组下标，文件描述符优先使用当前可用范围内最小的
 ### 文件IO操作
 - open
+``` c
+int open(const char *pathname, int flags);
+int open(const char *pathname, int flags, mode_t mode);
+int creat(const char *pathname, mode_t mode);
+```
+
+ 其中，flags必选项为O_RDONLY，O_WRONLY，O_RDWR。除必选项外均为创建选项和状态选项。
+
+mode对应fopen中mode，在创建文件需要使用带mode参数实现。这里采用变参实现。
+
 - close
+``` c
+int close(int fd);
+```
+
 - read
+``` c
+ssize_t read(int fd, void *buf, size_t count);
+```
+
 - write
+``` c
+ssize_t write(int fd, const void *buf, size_t count);
+```
+
 - lseek
+
+``` c
+off_t lseek(int fd, off_t offset, int whence);
+//whence:SEEK_SET,SEEK_CUR,SEEK_END
+// 返回值为定位位置index
+```
+
 ~~~ c
 #include <stdio.h>
 #include <stdlib.h>
@@ -604,6 +634,9 @@ int main()
 ~~~
 
 `strace`可以用来查看一个可执行文件的系统调用，使用`strace ./a.out`可以看到先进行1024次系统调用然后缓冲区满了1024合并为一次系统调用
+
+标准IO FILE结构体中fd与文件IO fd及pos一般不一致，因为有buffer及cache
+
 ### IO的效率问题
 
 
@@ -641,7 +674,7 @@ int main()
     close(1);//关闭标准输出
     dup(fd);
     close(fd);
-    
+
     /*********************/
     printf("Hello world\n");
     return 0;
@@ -672,7 +705,7 @@ int main()
     }
     //dup2 原子
     dup2(fd,1);
-	
+
 	if (fd != 1) {//打开的文件描述符如果不是1自己，就可以把他关掉了，有重定向后的 1 可以访问文件，保持尽量少的资源使用
 		close(fd);
 	}
