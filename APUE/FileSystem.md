@@ -1,7 +1,6 @@
 # 文件系统
 
 <hr/>
-
 ### 目标
 类似`ls`的实现
 
@@ -121,6 +120,11 @@ int fchmod(int fd,mode_t mode); //修改一个已经成功打开的文件
 ~~~
 ### 粘住位
 - `t位`
+
+粘住位：给某一个命令的使用痕迹做保留，现在有page cache可以不用t位
+
+现在主要是/tmp目录使用t位  ：各个用户对目录的操作会特殊保留
+
 ~~~ bash
 $ ls -l /
 drwxrwxrwt   1 root root 3.6K 2月   8 17:58 tmp
